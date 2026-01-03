@@ -1,29 +1,23 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-import numpy as np
-import pickle
+import joblib
+import os
 
 app = FastAPI()
 
-# Load model and scaler ONCE at startup
-with open("model/model.pkl", "rb") as f:
-    model = pickle.load(f)
-
-with open("model/scaler.pkl", "rb") as f:
-    scaler = pickle.load(f)
-
 class InputData(BaseModel):
-    features: list
+    features: list[float]
+
+BASE_DIR = os.path.dirname(__file__)
+model = joblib.load(os.path.join(BASE_DIR, "../model/model.pkl"))
+scaler = joblib.load(os.path.join(BASE_DIR, "../model/scaler.pkl"))
 
 @app.post("/")
-def predict(data: InputData):
-    features = np.array(data.features).reshape(1, -1)
-    features_scaled = scaler.transform(features)
-
-    prediction = int(model.predict(features_scaled)[0])
-    confidence = float(max(model.predict_proba(features_scaled)[0]))
-
+async def predict(data: InputData):
+    X = scaler.transform([data.features])
+    pred = model.predict(X)[0]
+    prob = max(model.predict_proba(X)[0])
     return {
-        "prediction": prediction,
-        "confidence": confidence
+        "prediction": int(pred),
+        "confidence": float(prob)
     }
