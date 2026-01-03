@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(__file__)
 model = joblib.load(os.path.join(BASE_DIR, "../model/model.pkl"))
 scaler = joblib.load(os.path.join(BASE_DIR, "../model/scaler.pkl"))
 
-@app.post("/predict")
+@app.post("/")
 async def predict(data: InputData):
     X = scaler.transform([data.features])
     pred = model.predict(X)[0]
