@@ -3,7 +3,7 @@ from pydantic import BaseModel
 import joblib
 import os
 
-app = FastAPI()
+app = FastAPI()   # 🔑 REQUIRED ENTRYPOINT
 
 class InputData(BaseModel):
     features: list[float]
@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(__file__)
 model = joblib.load(os.path.join(BASE_DIR, "../model/model.pkl"))
 scaler = joblib.load(os.path.join(BASE_DIR, "../model/scaler.pkl"))
 
-@app.post("/")
+@app.post("/predict")
 async def predict(data: InputData):
     X = scaler.transform([data.features])
     pred = model.predict(X)[0]
