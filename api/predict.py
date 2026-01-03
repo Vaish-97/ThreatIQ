@@ -15,7 +15,7 @@ with open("model/scaler.pkl", "rb") as f:
 class InputData(BaseModel):
     features: list
 
-@app.post("/predict")
+@app.post("/")
 def predict(data: InputData):
     features = np.array(data.features).reshape(1, -1)
     features_scaled = scaler.transform(features)
